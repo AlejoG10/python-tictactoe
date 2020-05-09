@@ -1,34 +1,32 @@
-# ---------
-# Libraries
-# ---------
+# -------
+# Modules
+# -------
 import numpy as np
 import pygame
 import math
 import sys
 
 
-
-# ------------------
-# Constant variables
-# ------------------
+# ---------
+# Constants
+# ---------
 # Board
 BOARD_ROWS = 3
 BOARD_COLS = 3
 # Figures
 SQUARE_SIZE = 200
-CIRCLE_RADIUS = 80
-OFFSET = 20
-LINES_WIDTH = 3
+CIRCLE_RADIUS = 60
+OFFSET = 55
+CIRCLE_LINE_WIDTH = 15
+X_LINE_WIDTH = 25
 # Screen
 SCREEN_WIDTH = BOARD_COLS * SQUARE_SIZE
 SCREEN_HEIGHT = BOARD_ROWS * SQUARE_SIZE
 # Colors
-WHITE = (255, 255, 255)
-DARK_BLUE = (12, 25, 46)
-PINK = (255, 0, 255)
-YELLOW = (188, 255, 0)
-RED = (255, 0, 0)
-
+LINE_COLOR = (23, 145, 135)
+BG_COLOR = (28, 170, 156)
+CIRCLE_COLOR = (237, 233, 213)
+X_COLOR = (66, 66, 66)
 
 
 # ---------
@@ -44,19 +42,19 @@ def draw_board():
 	draw_figures()
 
 def draw_lines():
-	pygame.draw.line(screen, WHITE, (0, 200), (600, 200), 1)
-	pygame.draw.line(screen, WHITE, (0, 400), (600, 400), 1)
-	pygame.draw.line(screen, WHITE, (200, 0), (200, 600), 1)
-	pygame.draw.line(screen, WHITE, (400, 0), (400, 600), 1)
+	pygame.draw.line(screen, LINE_COLOR, (0, 200), (600, 200), 10)
+	pygame.draw.line(screen, LINE_COLOR, (0, 400), (600, 400), 10)
+	pygame.draw.line(screen, LINE_COLOR, (200, 0), (200, 600), 10)
+	pygame.draw.line(screen, LINE_COLOR, (400, 0), (400, 600), 10)
 
 def draw_figures():
 	for col in range(BOARD_COLS):
 		for row in range(BOARD_ROWS):
 			if board[row][col] == 1:
-				pygame.draw.circle(screen, PINK, (int(col * SQUARE_SIZE + SQUARE_SIZE / 2), int(row * SQUARE_SIZE + SQUARE_SIZE / 2)), CIRCLE_RADIUS, LINES_WIDTH)
+				pygame.draw.circle(screen, CIRCLE_COLOR, (int(col * SQUARE_SIZE + SQUARE_SIZE / 2), int(row * SQUARE_SIZE + SQUARE_SIZE / 2)), CIRCLE_RADIUS, CIRCLE_LINE_WIDTH)
 			elif board[row][col] == 2:
-				pygame.draw.line(screen, YELLOW, (col * SQUARE_SIZE + OFFSET, row * SQUARE_SIZE + OFFSET), (col * SQUARE_SIZE + SQUARE_SIZE - OFFSET, row * SQUARE_SIZE + SQUARE_SIZE - OFFSET), LINES_WIDTH)
-				pygame.draw.line(screen, YELLOW, (col * SQUARE_SIZE + OFFSET, row * SQUARE_SIZE + SQUARE_SIZE - OFFSET), (col * SQUARE_SIZE + SQUARE_SIZE - OFFSET, row * SQUARE_SIZE + OFFSET), LINES_WIDTH)
+				pygame.draw.line(screen, X_COLOR, (col * SQUARE_SIZE + OFFSET, row * SQUARE_SIZE + OFFSET), (col * SQUARE_SIZE + SQUARE_SIZE - OFFSET, row * SQUARE_SIZE + SQUARE_SIZE - OFFSET), X_LINE_WIDTH)
+				pygame.draw.line(screen, X_COLOR, (col * SQUARE_SIZE + OFFSET, row * SQUARE_SIZE + SQUARE_SIZE - OFFSET), (col * SQUARE_SIZE + SQUARE_SIZE - OFFSET, row * SQUARE_SIZE + OFFSET), X_LINE_WIDTH)
 
 def full_board():
 	for col in range(BOARD_COLS):
@@ -86,7 +84,7 @@ def check_win(player):
 def check_vertical_win(player):
 	for col in range(BOARD_COLS):
 		if board[0][col] == player and board[1][col] == player and board[2][col] == player:
-			draw_vertical_winning_line(player, col)
+			draw_vertical_winning_line(col, player)
 			return True
 
 	return False
@@ -94,7 +92,7 @@ def check_vertical_win(player):
 def check_horizontal_win(player):
 	for row in range(BOARD_ROWS):
 		if board[row][0] == player and board[row][1] == player and board[row][2] == player:
-			draw_horizontal_winning_line(player, row)
+			draw_horizontal_winning_line(row, player)
 			return True
 
 	return False
@@ -103,24 +101,39 @@ def check_diagonal_win(player):
 	if board[0][0] == player and board[1][1] == player and board[2][2] == player:
 		draw_diagonal_winning_line(player)
 		return True
-	elif board[2][1] == player and board[1][1] == player and board[0][2] == player:
+	elif board[2][0] == player and board[1][1] == player and board[0][2] == player:
 		draw_diagonal_winning_line(player, False)
 		return True
 	else:
 		return False
 
-def draw_vertical_winning_line(player,col):
-	pass
+def draw_vertical_winning_line(col, player):
+	posX = col * SQUARE_SIZE + SQUARE_SIZE / 2
 
-def draw_horizontal_winning_line(player, row):
-	pass
+	if player == 1:
+		pygame.draw.line(screen, CIRCLE_COLOR, (posX, 10), (posX, SCREEN_HEIGHT - 10), CIRCLE_LINE_WIDTH)
+	else:
+		pygame.draw.line(screen, X_COLOR, (posX, 10), (posX, SCREEN_HEIGHT - 10), CIRCLE_LINE_WIDTH)
+
+def draw_horizontal_winning_line(row, player):
+	posY = row * SQUARE_SIZE + SQUARE_SIZE / 2
+
+	if player == 1:
+		pygame.draw.line(screen, CIRCLE_COLOR, (10, posY), (SCREEN_WIDTH - 10, posY), CIRCLE_LINE_WIDTH)
+	else:
+		pygame.draw.line(screen, X_COLOR, (10, posY), (SCREEN_WIDTH - 10, posY), CIRCLE_LINE_WIDTH)
 
 def draw_diagonal_winning_line(player, down_diag=True):
 	if down_diag:
-		pass
+		if player == 1:
+			pygame.draw.line(screen, CIRCLE_COLOR, (25, 25), (SCREEN_WIDTH - 25, SCREEN_HEIGHT - 25), X_LINE_WIDTH)
+		else:
+			pygame.draw.line(screen, X_COLOR, (25, 25), (SCREEN_WIDTH - 25, SCREEN_HEIGHT - 25), X_LINE_WIDTH)
 	else:
-		pass
-
+		if player == 1:
+			pygame.draw.line(screen, CIRCLE_COLOR, (25, SCREEN_HEIGHT - 25), (SCREEN_WIDTH - 25, 25), X_LINE_WIDTH)
+		else:
+			pygame.draw.line(screen, X_COLOR, (25, SCREEN_HEIGHT - 25), (SCREEN_WIDTH - 25, 25), X_LINE_WIDTH)
 
 
 # -------------
@@ -128,22 +141,24 @@ def draw_diagonal_winning_line(player, down_diag=True):
 # -------------
 board = np.zeros((BOARD_ROWS, BOARD_COLS))
 
+
 # -------------
 # Graphic Board
 # -------------
 pygame.init()
 pygame.display.set_caption("TIC TAC TOE")
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-screen.fill(DARK_BLUE)
+screen.fill(BG_COLOR)
 draw_lines()
 pygame.display.update()
+
 
 # ---------
 # Variables
 # ---------
 player = 0
 game_over = False
-
+in_menu = True
 
 
 # --------
@@ -182,7 +197,7 @@ while True:
 			if full_board():
 				game_over = True
 
-	draw_board()
+	draw_figures()
 	pygame.display.update()
 
 
